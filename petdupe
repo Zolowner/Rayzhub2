@@ -1,0 +1,133 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local function showLoadingScreen()
+    local loadingGui = Instance.new("ScreenGui")
+    loadingGui.Name = "| Rayz |"
+    loadingGui.Parent = player:WaitForChild("PlayerGui")
+    loadingGui.ResetOnSpawn = false
+    loadingGui.IgnoreGuiInset = true
+
+    local rainbowColor = Color3.fromRGB(255, 0, 0)
+
+    -- Function to start rainbow effect
+    local function startRainbowEffect(applyColor)
+        coroutine.wrap(function()
+            local hue = 0
+            while loadingGui.Parent do
+                hue = (hue + 0.01) % 1
+                local color = Color3.fromHSV(hue, 1, 1)
+                applyColor(color)
+                task.wait(0.03)
+            end
+        end)()
+    end
+
+    local bg = Instance.new("Frame", loadingGui)
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    bg.BackgroundTransparency = 0.3
+
+    local loadingMain = Instance.new("Frame", bg)
+    loadingMain.Size = UDim2.new(0, 410, 0, 170)
+    loadingMain.Position = UDim2.new(0.5, -205, 0.5, -85)
+    loadingMain.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    Instance.new("UICorner", loadingMain).CornerRadius = UDim.new(0, 22)
+
+    local mainStroke = Instance.new("UIStroke", loadingMain)
+    mainStroke.Color = rainbowColor
+    mainStroke.Thickness = 2
+    mainStroke.Transparency = 0
+
+    local title = Instance.new("TextLabel", loadingMain)
+    title.Position = UDim2.new(0.5, -100, 0, 28)
+    title.Size = UDim2.new(0, 200, 0, 34)
+    title.BackgroundTransparency = 1
+    title.Text = "ZOLEX EGGPRE"
+    title.TextXAlignment = Enum.TextXAlignment.Center
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 28
+    title.TextColor3 = rainbowColor
+
+    local barBack = Instance.new("Frame", loadingMain)
+    barBack.Size = UDim2.new(0.87, 0, 0, 32)
+    barBack.Position = UDim2.new(0.065, 0, 0, 80)
+    barBack.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Instance.new("UICorner", barBack).CornerRadius = UDim.new(0, 15)
+
+    local barBackStroke = Instance.new("UIStroke", barBack)
+    barBackStroke.Color = rainbowColor
+    barBackStroke.Thickness = 1.8
+    barBackStroke.Transparency = 0
+
+    local bar = Instance.new("Frame", barBack)
+    bar.Size = UDim2.new(0, 0, 1, 0)
+    bar.BackgroundColor3 = rainbowColor
+    Instance.new("UICorner", bar).CornerRadius = UDim.new(0, 15)
+
+    local loadingText = Instance.new("TextLabel", loadingMain)
+    loadingText.Position = UDim2.new(0.065, 0, 0, 122)
+    loadingText.Size = UDim2.new(0.87, 0, 0, 22)
+    loadingText.BackgroundTransparency = 1
+    loadingText.Text = "Loading..."
+    loadingText.Font = Enum.Font.GothamBold
+    loadingText.TextSize = 18
+    loadingText.TextColor3 = rainbowColor
+    loadingText.TextXAlignment = Enum.TextXAlignment.Left
+
+    local subText = Instance.new("TextLabel", loadingMain)
+    subText.Position = UDim2.new(0.065, 0, 1, -26)
+    subText.Size = UDim2.new(0.87, 0, 0, 20)
+    subText.BackgroundTransparency = 1
+    subText.Text = "Powered by Ghoul Engine"
+    subText.TextXAlignment = Enum.TextXAlignment.Left
+    subText.Font = Enum.Font.Gotham
+    subText.TextSize = 16
+    subText.TextColor3 = Color3.fromRGB(150, 150, 150)
+
+    -- Start rainbow color update loop
+    startRainbowEffect(function(color)
+        mainStroke.Color = color
+        barBackStroke.Color = color
+        title.TextColor3 = color
+        bar.BackgroundColor3 = color
+        loadingText.TextColor3 = color
+    end)
+
+    -- Animate bar
+    local totalTime = 10
+    local steps = 100
+    for i = 1, steps do
+        local progress = i / steps
+        TweenService:Create(bar, TweenInfo.new(0.1, Enum.EasingStyle.Linear), {
+            Size = UDim2.new(progress, 0, 1, 0)
+        }):Play()
+        loadingText.Text = "Loading" .. string.rep(".", i % 4)
+        task.wait(totalTime / steps)
+    end
+
+    loadingText.Text = "Ready!"
+
+    -- Fade Out all (including UIStroke)
+    local function fadeOutGuiObjects(root, duration)
+        for _, obj in ipairs(root:GetDescendants()) do
+            if obj:IsA("GuiObject") then
+                if obj:IsA("TextLabel") then
+                    TweenService:Create(obj, TweenInfo.new(duration), {TextTransparency = 1}):Play()
+                end
+                TweenService:Create(obj, TweenInfo.new(duration), {BackgroundTransparency = 1}):Play()
+            elseif obj:IsA("UIStroke") then
+                TweenService:Create(obj, TweenInfo.new(duration), {Transparency = 1}):Play()
+            end
+        end
+    end
+
+    task.wait(0.10)
+    fadeOutGuiObjects(loadingGui, 0.6)
+    task.wait(0.10)
+    loadingGui:Destroy()
+end
+
+showLoadingScreen()
